@@ -1,12 +1,15 @@
-def call(String imageName, String buildNumber) {
-    def fullImageName = "${imageName}:${buildNumber}"
-    
-    echo "Building Docker Image: ${fullImageName}"
-    sh "docker build -t ${fullImageName} ."
-    
-    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-        sh "echo $PASS | docker login -u $USER --password-stdin"
-        sh "docker tag ${fullImageName} ${USER}/${fullImageName}"
-        sh "docker push ${USER}/${fullImageName}"
+def call(String imageName, String dockerhubCredID) {
+    echo "--- Building Docker Image: ${imageName} ---"
+    sh "docker build -t ${imageName} ."
+
+    echo "--- Pushing Image to Docker Hub ---"
+    withCredentials([usernamePassword(credentialsId: dockerhubCredID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+        sh """
+            docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+            docker push ${imageName}
+        """
     }
+
+    echo "--- Removing Local Image to save space ---"
+    sh "docker rmi ${imageName}"
 }
