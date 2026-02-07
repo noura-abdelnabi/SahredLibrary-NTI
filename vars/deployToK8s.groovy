@@ -8,6 +8,6 @@ def call(String imageName, String deploymentFile, String tokenID, String apiServ
         string(credentialsId: tokenID, variable: 'TOKEN'),
         string(credentialsId: apiServerID, variable: 'APISERVER')
     ]) {
-        sh "kubectl apply -f ${deploymentFile} --server=${APISERVER} --token=${TOKEN} --insecure-skip-tls-verify=true"
+        sh "kubectl apply -f ${deploymentFile} -n ${env.BRANCH_NAME} --server=${APISERVER} --token=${TOKEN} --insecure-skip-tls-verify=true"
     }
 }
