@@ -2,8 +2,8 @@ def call(String imageName, String dockerhubCredID) {
     echo "--- Building Docker Image: ${imageName} ---"
     sh "docker build -t ${imageName} ."
 
-    //echo "--- Phase: Scanning Docker Image: ${imageName} ---"
-    //sh "trivy image --severity HIGH,CRITICAL --timeout 20m ${imageName}"
+    echo "--- Phase: Scanning Docker Image: ${imageName} ---"
+    sh "trivy image --severity HIGH,CRITICAL --timeout 20m ${imageName}"
     
     echo "--- Pushing Image to Docker Hub ---"
     withCredentials([usernamePassword(credentialsId: dockerhubCredID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
